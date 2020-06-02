@@ -1,0 +1,51 @@
+{
+  "name": "yandex-locator",
+  "version": "0.0.2",
+  "description": "(DEMO VERSION!) This is plugin for get geolocation via GSM and Wifi",
+  "main": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rimraf ./dist",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "Pavel Melnikov",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "latest"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.0",
+    "typescript": "^3.2.4",
+    "@capacitor/ios": "latest",
+    "@capacitor/android": "latest"
+  },
+  "files": [
+    "dist/",
+    "ios/",
+    "android/",
+    "Yandex.Locator.podspec"
+  ],
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "yandex",
+    "locator"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:melnikovpa/capacitor.yandex.geolocation.git"
+  },
+  "bugs": {
+    "url": "git@github.com:melnikovpa/capacitor.yandex.geolocation.git/issues"
+  }
+}
