@@ -9,7 +9,7 @@ export class YandexLocatorPluginWeb extends WebPlugin implements YandexLocatorPl
     });
   }
 
-  async echo(options: { value: string }): Promise<{value: string}> {
+  async echo(options: { version: string, url: string, api_key: string }): Promise<{version: string, url: string, api_key: string}> {
     console.log('ECHO', options);
     return options;
   }
