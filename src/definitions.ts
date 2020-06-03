@@ -5,5 +5,5 @@ declare module "@capacitor/core" {
 }
 
 export interface YandexLocatorPluginPlugin {
-  echo(options: { value: string }): Promise<{value: string}>;
+  echo(options: { version: string, url: string, api_key: string }): Promise<{version: string, url: string, api_key: string}>;
 }

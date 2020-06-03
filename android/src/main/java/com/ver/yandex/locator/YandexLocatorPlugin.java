@@ -29,38 +29,47 @@ import java.util.Calendar;
         Manifest.permission.ACCESS_COARSE_LOCATION
     }
 )
-public class YandexLocatorPlugin extends Plugin {
-
+public class YandexLocatorPlugin extends Plugin
+{
     static final int REQUEST_LOCATION_PERMISSION = 9874;
-
     private JSObject result = new JSObject();
+
+    protected String version = "1.0";
+    protected String url     = "http://api.lbs.yandex.net/geolocation";
+    protected String apiKey  = "";
 
     @PluginMethod()
     public void echo(PluginCall call) {
         saveCall(call);
 
-        this.result.put("gsm_cells", getGsmCellLocation());
-        this.result.put("wifi_networks", getCurrentNetworkInfo());
+        if (!call.getString("version").isEmpty()) {
+            this.version = call.getString("version");
+        }
 
-        call.success(result);
+        if (!call.getString("url").isEmpty()) {
+            this.url = call.getString("url");
+        }
 
-        pluginRequestPermissions(new String[] {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE
-        }, REQUEST_LOCATION_PERMISSION);
+        if (!call.getString("api_key").isEmpty()) {
+            this.apiKey = call.getString("api_key");
+        }
+
+        if (hasRequiredPermissions()) {
+            this.prepareRequestData();
+        } else {
+            pluginRequestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_WIFI_STATE
+            }, REQUEST_LOCATION_PERMISSION);
+        }
     }
 
     @Override
     protected void handleRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.handleRequestPermissionsResult(requestCode, permissions, grantResults);
         PluginCall savedCall = getSavedCall();
-
-//        if (savedCall == null) {
-//            Log.d("yandex.locator", "No stored plugin call for permissions request result");
-//            return;
-//        }
 
         for(int result : grantResults) {
             if (result == PackageManager.PERMISSION_DENIED) {
@@ -70,11 +79,22 @@ public class YandexLocatorPlugin extends Plugin {
         }
 
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            this.result.put("gsm_cells", getGsmCellLocation());
-            this.result.put("wifi_networks", getCurrentNetworkInfo());
-
-            savedCall.success(result);
+            this.prepareRequestData();
         }
+    }
+
+    private void prepareRequestData()
+    {
+        PluginCall savedCall = getSavedCall();
+        this.result.put("gsm_cells", getGsmCellLocation());
+        this.result.put("wifi_networks", getCurrentNetworkInfo());
+
+        savedCall.success(result);
+    }
+
+    private void sendYandexRequest()
+    {
+
     }
 
     private JSObject getGsmCellLocation() {
