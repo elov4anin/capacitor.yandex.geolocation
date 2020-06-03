@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
@@ -18,7 +19,18 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.Calendar;
+
+import javax.net.ssl.HttpsURLConnection;
 
 @NativePlugin(
     requestCodes={YandexLocatorPlugin.REQUEST_LOCATION_PERMISSION},
@@ -89,12 +101,73 @@ public class YandexLocatorPlugin extends Plugin
         this.result.put("gsm_cells", getGsmCellLocation());
         this.result.put("wifi_networks", getCurrentNetworkInfo());
 
+        sendPost();
+
         savedCall.success(result);
     }
 
-    private void sendYandexRequest()
-    {
+    public void sendPost() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(YandexLocatorPlugin.this.url);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+                    conn.setRequestProperty("Accept","application/json");
+                    conn.setDoOutput(true);
+                    conn.setDoInput(true);
 
+                    JSONObject jsonParam = new JSONObject();
+
+                    JSONObject commonObj = new JSONObject();
+                    commonObj.put("version", YandexLocatorPlugin.this.version);
+                    commonObj.put("api_key", YandexLocatorPlugin.this.apiKey);
+                    jsonParam.put("common", commonObj);
+
+                    JSObject gsm_cells = (JSObject) YandexLocatorPlugin.this.result.get("gsm_cells");
+                    if (gsm_cells.has("country")) {
+                        JSONArray gsmCellsList = new JSONArray();
+                        JSONObject gsmCellObj = new JSObject();
+                        gsmCellObj.put("countrycode", gsm_cells.get("country"));
+                        gsmCellObj.put("operatorid", gsm_cells.get("operatorId"));
+                        gsmCellObj.put("cellid", gsm_cells.get("cid"));
+                        gsmCellObj.put("lac", gsm_cells.get("lac"));
+                        gsmCellsList.put(gsmCellObj);
+                        jsonParam.put("gsm_cells", gsmCellsList);
+                    }
+
+                    JSObject wifi_networks = (JSObject) YandexLocatorPlugin.this.result.get("wifi_networks");
+                    if (wifi_networks.has("mac")) {
+                        JSONArray networkCellsList = new JSONArray();
+                        JSONObject networkCellObj = new JSObject();
+                        networkCellObj.put("mac", wifi_networks.get("mac"));
+                        networkCellsList.put(networkCellObj);
+                        jsonParam.put("wifi_networks", networkCellsList);
+                    }
+
+                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+                    //os.writeBytes(URLEncoder.encode(jsonParam.toString(), "UTF-8"));
+                    os.writeBytes(jsonParam.toString());
+
+                    os.flush();
+                    os.close();
+
+                    bridge.triggerWindowJSEvent("yandexLocation",
+                            "{'code': " + String.valueOf(conn.getResponseCode()) + "', 'data': '" + conn.getResponseMessage() + "' }");
+
+                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
+                    Log.i("MSG" , conn.getResponseMessage());
+
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
     }
 
     private JSObject getGsmCellLocation() {
