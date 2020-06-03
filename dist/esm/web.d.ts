@@ -3,9 +3,13 @@ import { YandexLocatorPluginPlugin } from './definitions';
 export declare class YandexLocatorPluginWeb extends WebPlugin implements YandexLocatorPluginPlugin {
     constructor();
     echo(options: {
-        value: string;
+        version: string;
+        url: string;
+        api_key: string;
     }): Promise<{
-        value: string;
+        version: string;
+        url: string;
+        api_key: string;
     }>;
 }
 declare const YandexLocatorPlugin: YandexLocatorPluginWeb;
