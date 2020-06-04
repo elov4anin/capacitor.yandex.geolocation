@@ -30,7 +30,7 @@ public class Locator implements LocationInterface
 
     public String version = "1.0";
     public String url     = "https://api.lbs.yandex.net/geolocation";
-    public String apiKey  = "AGDz1F4BAAAAXd6hMwIAtUy2sTNNLgH5fXTNMv7t2VqFcPQAAAAAAAAAAACndRrdgOXLAFC1ns6kPEa41okezQ==";
+    public String apiKey  = "";
 
     private Context context = null;
 
@@ -56,6 +56,8 @@ public class Locator implements LocationInterface
                     conn.setRequestProperty("Accept","application/json");
                     conn.setDoOutput(true);
                     conn.setDoInput(true);
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(10000);
 
                     JSONObject jsonParam = new JSONObject();
 

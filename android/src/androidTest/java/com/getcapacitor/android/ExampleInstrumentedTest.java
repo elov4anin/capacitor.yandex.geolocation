@@ -25,7 +25,6 @@ import static org.junit.Assert.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-
     @Rule
     public GrantPermissionRule mRuntimePermissionNetRule = GrantPermissionRule .grant(android.Manifest.permission.ACCESS_NETWORK_STATE);
 
@@ -45,8 +44,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//
-//        assertEquals("com.getcapacitor.android", appContext.getPackageName());
 
         Locator locator = new Locator(appContext);
         locator.prepareRequestData();
