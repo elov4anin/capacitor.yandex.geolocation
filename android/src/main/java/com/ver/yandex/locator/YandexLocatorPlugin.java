@@ -3,6 +3,7 @@ package com.ver.yandex.locator;
 import android.Manifest;
 import android.content.pm.PackageManager;
 
+import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -80,8 +81,10 @@ public class YandexLocatorPlugin extends Plugin
         this.locator.sendPost(new PostCallbackInterface() {
             @Override
             public void success(String code, String message) {
-                bridge.triggerWindowJSEvent("yandexLocation",
-                        "{'code': " + code + "', 'data': '" + message + "' }");
+                JSObject ret = new JSObject();
+                ret.put("code", code);
+                ret.put("data", message);
+                notifyListeners("yandexLocation", ret);
             }
         });
 

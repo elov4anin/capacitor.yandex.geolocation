@@ -45,9 +45,9 @@ public class Locator implements LocationInterface
     }
 
     public void sendPost(final PostCallbackInterface callbackInterface) {
-//        Thread thread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
                 try {
                     URL url = new URL(Locator.this.url);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -110,10 +110,10 @@ public class Locator implements LocationInterface
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-//            }
-//        });
-//
-//        thread.start();
+            }
+        });
+
+        thread.start();
     }
 
     public JSObject getGsmCellLocation() {
