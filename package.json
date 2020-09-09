@@ -18,14 +18,11 @@
   "devDependencies": {
     "rimraf": "^3.0.0",
     "typescript": "^3.2.4",
-    "@capacitor/ios": "latest",
     "@capacitor/android": "latest"
   },
   "files": [
     "dist/",
-    "ios/",
-    "android/",
-    "Yandex.Locator.podspec"
+    "android/"
   ],
   "keywords": [
     "capacitor",
@@ -34,9 +31,6 @@
     "locator"
   ],
   "capacitor": {
-    "ios": {
-      "src": "ios"
-    },
     "android": {
       "src": "android"
     }
